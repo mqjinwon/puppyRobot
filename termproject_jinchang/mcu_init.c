@@ -17,9 +17,10 @@
 void InitIO(){
 
 	DDRA = 0xff; //LED
-	DDRC = 0xff; //원하는거 넣으면 될듯
-	DDRD = 0x00; //interrupt
+	DDRC = 0xff; //원하는거 넣으면 될듯  //PC0(trigger)
+	DDRD = 0x00; //interrupt //PD2(echo)
 	
+	PORTC = 0x00;
 	PORTA = 0xff;
 }
 
@@ -35,9 +36,9 @@ void InitExtInt(){
 
 	DDRD = 0x00;
 	
-	EICRA = INT1_FALLING | INT0_FALLING;
+	EICRA = INT1_FALLING | INT0_FALLING | INT2_RISING;
 	
-	EIMSK = INT1_ENABLE | INT0_ENABLE;
+	EIMSK = INT1_ENABLE | INT0_ENABLE | INT2_ENABLE;
 }
 
 
@@ -87,7 +88,7 @@ void InitTimer2(){
 	TCNT2 = 256-156; // 0.01초
 
 	//using timer2 overflow_interrupt
-	TIMSK =  (1<<TOIE2);
+	//TIMSK =  (1<<TOIE2);
 }
 
 
@@ -359,4 +360,50 @@ int GetPOWER(){
 	if(power >= 10000)
 		power = 9999;
 	return power;
+}
+//////////////////////////////////////////////////////////////////
+//CalTHEMISTER()
+//CalTHEMISTER
+// Input :
+// Output : temperature
+//////////////////////////////////////////////////////////////////
+
+int GetPSD(){
+	int adc  = GetADC(ADC_MUX_PSD);
+	float vout = 5 * ((double)1/1023) * adc;
+	int dis = 28.014*pow(vout,-1.234);
+
+	return dis;
+}
+
+double GetWATER(){
+
+	int value = GetADC(ADC_MUX_WATER);
+	double depth = 0;
+	if(value > 700){
+		value = WATER_MAX;
+	}
+	else if(value < 500){
+		value = WATER_MIN;
+	}
+	depth = (double)(value-WATER_MIN)/(WATER_MAX-WATER_MIN);
+	depth = depth/25;
+
+	return depth;
+
+}
+
+
+//////////////////////////////////////////////////////////////////
+//Trigger()
+//CalTHEMISTER
+// Input :
+// Output : 
+//////////////////////////////////////////////////////////////////
+void Trigger(){
+	PORTC = 0xfe;
+	_delay_us(2);
+	PORTC = 0x01;
+	_delay_us(10);
+	PORTC = 0xfe;
 }
