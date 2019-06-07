@@ -40,12 +40,12 @@ ISR(TIMER3_OVF_vect){
 	if(g_cnt>25)
 	{
 
-		TransNumUart1(GetResistor()); TransUart1(','); TransUart1(' ');
-		TransNumUart1(GetCDS()); TransUart1(','); TransUart1(' ');
-		TransNumUart1(GetLM35()); TransUart1(','); TransUart1(' ');
-		TransNumUart1(GetTHEMISTER()); TransUart1(','); TransUart1(' ');
-
-		TransNumUart1(GetPOWER()); TransUart1(','); TransUart1(' ');
+		//TransNumUart1(GetResistor()); TransUart1(','); TransUart1(' ');		
+		//TransNumUart1(GetCDS()); TransUart1(','); TransUart1(' ');
+		//TransNumUart1(GetLM35()); TransUart1(','); TransUart1(' ');
+		//TransNumUart1(GetTHEMISTER()); TransUart1(','); TransUart1(' ');
+		TransNumUart1(GetGAS()); TransUart1(','); TransUart1(' ');
+		//TransNumUart1(GetPOWER()); TransUart1(','); TransUart1(' ');
 		 
 		TransUart1('\n');         
 		TransUart1('\r');

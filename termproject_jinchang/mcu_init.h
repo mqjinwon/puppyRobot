@@ -57,6 +57,7 @@ int GetResistor();
 int GetCDS();
 int GetLM35();
 int GetTHEMISTER();
+int GetGAS();
 int GetPOWER();
 
 //////////////////////////////////////////////////////////////////
