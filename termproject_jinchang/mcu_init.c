@@ -18,9 +18,11 @@ void InitIO(){
 
 	DDRA = 0xff; //LED
 	DDRC = 0xff; //원하는거 넣으면 될듯  //PC0(trigger)
+	DDRB = 0x60; // 모터 활성화(OCR1A, OCR1B)
 	DDRD = 0x00; //interrupt //PD2(echo)
-	
-	PORTC = 0x00;
+
+	PORTC = 0x00; // 0번은 초음파 트리거, 4~7번은 모터 방향
+	PORTC = PORTC | 0x50;
 	PORTA = 0xff;
 }
 
@@ -34,8 +36,9 @@ void InitIO(){
 //////////////////////////////////////////////////////////////////
 void InitExtInt(){
 
-	DDRD = 0x00;
-	
+	cbi(PORTD, 0);
+	cbi(PORTD, 1);
+
 	EICRA = INT1_FALLING | INT0_FALLING | INT2_RISING;
 	
 	EIMSK = INT1_ENABLE | INT0_ENABLE | INT2_ENABLE;
@@ -150,7 +153,8 @@ int GetADC(char ch){
 void InitUart0(){
 
 	//TO DO
-	DDRE = 0x03;
+	sbi(PORTE, 1);
+	cbi(PORTE, 0);
 	
 	UCSR0A = 0x00;
 	UCSR0B = USART_RECV_ENABLE | USART_TRANS_ENABLE;
@@ -401,9 +405,9 @@ double GetWATER(){
 // Output : 
 //////////////////////////////////////////////////////////////////
 void Trigger(){
-	PORTC = 0xfe;
+	cbi(PORTC, 0);
 	_delay_us(2);
-	PORTC = 0x01;
+	sbi(PORTC, 0);
 	_delay_us(10);
-	PORTC = 0xfe;
+	cbi(PORTC, 0);
 }
