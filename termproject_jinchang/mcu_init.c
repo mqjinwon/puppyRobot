@@ -37,11 +37,9 @@ void InitIO(){
 void InitExtInt(){
 
 	cbi(PORTD, 0);
-	cbi(PORTD, 1);
 
-	EICRA = INT1_FALLING | INT0_FALLING | INT2_RISING;
-	
-	EIMSK = INT1_ENABLE | INT0_ENABLE | INT2_ENABLE;
+	EICRA = INT2_RISING;	
+	EIMSK = INT2_ENABLE;
 }
 
 
@@ -174,13 +172,13 @@ void InitUart0(){
 void InitUart1(){
 	
 	//TO DO
-	DDRD = (DDRD & 0xF3) | 0x08;
+	//DDRD = (DDRD & 0xF3) | 0x08;
 	
-	UCSR1A = 0x00;
-	UCSR1B = USART_RECV_ENABLE | USART_TRANS_ENABLE;
-	UCSR1C = USART_CHAR_SIZE_8BIT;
+	//UCSR1A = 0x00;
+	//UCSR1B = USART_RECV_ENABLE | USART_TRANS_ENABLE;
+	//UCSR1C = USART_CHAR_SIZE_8BIT;
 	
-	UBRR1L = USART_115200BPS;
+	//UBRR1L = USART_115200BPS;
 }
 
 
@@ -361,8 +359,8 @@ int GetPOWER(){
 	int adc = GetADC(ADC_MUX_POWER);
 	float vout = 5 * ((double)1/1023) * adc;
 	float power = powf(4.23, vout);
-	if(power >= 10000)
-		power = 9999;
+	if(power >= 1000)
+		power = 999;
 	return power;
 }
 //////////////////////////////////////////////////////////////////
@@ -393,7 +391,7 @@ double GetWATER(){
 	depth = (double)(value-WATER_MIN)/(WATER_MAX-WATER_MIN);
 	depth = depth/25;
 
-	return depth;
+	return value;
 
 }
 

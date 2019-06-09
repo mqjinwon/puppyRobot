@@ -16,24 +16,13 @@ int g_ADC[8] = {0,}; //adc 전역변수
 double u_end = 0;
 double u_distance = 0;
 
-ISR()
-
-ISR(INT0_vect){
-	
-	PORTA = 0x00;
-}
-
-
-ISR(INT1_vect){
-
-	PORTA = 0xFF;	
-}
+unsigned char recvData = 0;
 
 ISR(INT2_vect){
 	if ((EICRA & 0b00110000) == 0b00100000)//falling //TCNT1당 0.064ms 34 cm/ms
 	{
 		u_end=TCNT2;
-		u_distance= u_end* 2.176;
+		u_distance= u_end* 1.088;
 		EICRA = (EICRA &0b11001111)| 0b00110000;//라이징으로 바꿈
 	}
 
@@ -44,39 +33,37 @@ ISR(INT2_vect){
 	}
 }
 
+
 //제어주기 : 20ms
 ISR(TIMER3_OVF_vect){
 	
 	TCNT3 = 64285; // Bottom 설정
-	g_cnt++;
-
-	//0.5초에 한번씩 실행
-	if(g_cnt>25)
-	{
-
-		TransNumUart0(GetResistor()); TransUart1(','); TransUart1(' ');		
-		TransNumUart1(GetCDS()); TransUart1(','); TransUart1(' ');
-		TransNumUart1(GetLM35()); TransUart1(','); TransUart1(' ');
-		TransNumUart1(GetTHEMISTER()); TransUart1(','); TransUart1(' ');
-		TransNumUart1(GetGAS()); TransUart1(','); TransUart1(' ');
-		TransNumUart1(GetPOWER()); TransUart1(','); TransUart1(' ');
-		 
-		TransUart0('\n');         
-		TransUart0('\r');
-
-		g_cnt = 0;
-	}
-	//Trigger();
 	
-	//TransNumUart1(u_distance);
-	//TransUart1(',');
-	//TransNumUart1(u_end);
 
-	//TransUart1(13);
+	if(recvData == 'a')
+	{
+		PORTA = ~PORTA;
+	}
+
+	TransUart0('S');
+	TransNumUart0(GetResistor()); TransUart0(',');
+	TransNumUart0(GetCDS()); TransUart0(',');
+	TransNumUart0(GetLM35()); TransUart0(',');
+	TransNumUart0(GetTHEMISTER()); TransUart0(',');
+	TransNumUart0(GetGAS()); TransUart0(',');
+	TransNumUart0(GetPOWER()); TransUart0(',');
+	TransNumUart0(GetPSD()); TransUart0(',');
+	TransNumUart0(GetWATER()); TransUart0(',');
+	Trigger();
+	TransNumUart0((int)u_distance); TransUart0(',');
+	TransUart0('E');
+
 
 	//모터제어
-	OCR1A = 799;
-	OCR1B = 799;
+	OCR1A = 500;
+	OCR1B = 500;
+
+	recvData = 0; // 받은 데이터 초기화
 }
 
 
@@ -93,12 +80,10 @@ int main(void)
 	InitUart1();
 	
 	sei();
-
-	//PD 2(echo)
-	//PC 0(trigger)
 	
     while (1) 
-    {			
+    {				
+		recvData = RecvUart0();
     }
 
 	return 0;
